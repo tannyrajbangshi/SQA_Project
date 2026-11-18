@@ -1,0 +1,138 @@
+{
+  "info": {
+    "_postman_id": "0af3a0f5-851f-4a27-beae-f1f0f9296bc1",
+    "name": "Demo Web Shop API Automation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58688096",
+    "_collection_link": "https://go.postman.co/collection/58688096-0af3a0f5-851f-4a27-beae-f1f0f9296bc1?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "GET All Users",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\n// Validate status code\r\npm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// Parse response\r\nconst users = pm.response.json();\r\n\r\n// Validate non-empty array\r\npm.test(\"Response is a non-empty array\", function () {\r\n    pm.expect(users).to.be.an(\"array\");\r\n    pm.expect(users.length).to.be.above(0);\r\n});\r\n\r\n// Validate user information\r\npm.test(\"Users contain required fields\", function () {\r\n\r\n    users.forEach(function (user) {\r\n\r\n        pm.expect(user).to.have.property(\"id\");\r\n        pm.expect(user).to.have.property(\"name\");\r\n        pm.expect(user).to.have.property(\"email\");\r\n\r\n    });\r\n});\r\n\r\n// Save one user ID\r\nconst selectedUser = users[0];\r\n\r\npm.collectionVariables.set(\r\n    \"userId\",\r\n    selectedUser.id\r\n);\r\n\r\n// Save original user details\r\npm.collectionVariables.set(\r\n    \"originalUser\",\r\n    JSON.stringify(selectedUser)\r\n);\r\n\r\nconsole.log(\"Selected User ID:\", selectedUser.id);\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/users",
+          "protocol": "https",
+          "host": [
+            "jsonplaceholder",
+            "typicode",
+            "com"
+          ],
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT Update User",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\n// Get original user data from GET request\r\nconst user = JSON.parse(\r\n    pm.collectionVariables.get(\"originalUser\")\r\n);\r\n\r\n// Generate dynamic updated data\r\nconst timestamp = Date.now();\r\n\r\nconst updatedName = \"Tanny Updated \" + timestamp;\r\nconst updatedEmail = \"tanny\" + timestamp + \"@example.com\";\r\nconst updatedCompanyName = \"SQA Automation Company\";\r\n\r\n// Store updated data\r\npm.collectionVariables.set(\"updatedName\", updatedName);\r\npm.collectionVariables.set(\"updatedEmail\", updatedEmail);\r\npm.collectionVariables.set(\"updatedCompanyName\", updatedCompanyName);\r\n\r\n// Preserve unchanged fields\r\npm.collectionVariables.set(\"originalUsername\", user.username);\r\npm.collectionVariables.set(\"originalAddress\", JSON.stringify(user.address));\r\npm.collectionVariables.set(\"originalPhone\", user.phone);\r\npm.collectionVariables.set(\"originalWebsite\", user.website);\r\npm.collectionVariables.set(\"originalCatchPhrase\", user.company.catchPhrase);\r\npm.collectionVariables.set(\"originalBs\", user.company.bs);\r\n"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\n// Validate status code\r\npm.test(\"PUT status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\nconst response = pm.response.json();\r\n\r\nconst savedId = Number(\r\n    pm.collectionVariables.get(\"userId\")\r\n);\r\n\r\nconst updatedName = pm.collectionVariables.get(\r\n    \"updatedName\"\r\n);\r\n\r\n// Validate returned ID\r\npm.test(\"Returned ID matches saved ID\", function () {\r\n    pm.expect(response.id).to.eql(savedId);\r\n});\r\n\r\n// Validate phone is not empty\r\npm.test(\"Phone should not be empty\", function () {\r\n    pm.expect(response.phone).to.be.a(\"string\");\r\n    pm.expect(response.phone.trim()).to.not.equal(\"\");\r\n});\r\n\r\n// Validate updated name\r\npm.test(\"Updated name should match\", function () {\r\n    pm.expect(response.name).to.eql(updatedName);\r\n});\r\n\r\n// Validate updated email\r\npm.test(\"Updated email should match\", function () {\r\n    pm.expect(response.email).to.eql(\r\n        pm.collectionVariables.get(\"updatedEmail\")\r\n    );\r\n});\r\n\r\n// Validate updated company name\r\npm.test(\"Company name should be updated\", function () {\r\n    pm.expect(response.company.name).to.eql(\r\n        pm.collectionVariables.get(\"updatedCompanyName\")\r\n    );\r\n});\r\n\r\nconsole.log(\"PUT Response:\", response);\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "\r\n{\r\n    \"id\": {{userId}},\r\n    \"name\": \"{{updatedName}}\",\r\n    \"username\": \"{{originalUsername}}\",\r\n    \"email\": \"{{updatedEmail}}\",\r\n    \"address\": {{originalAddress}},\r\n    \"phone\": \"{{originalPhone}}\",\r\n    \"website\": \"{{originalWebsite}}\",\r\n    \"company\": {\r\n        \"name\": \"{{updatedCompanyName}}\",\r\n        \"catchPhrase\": \"{{originalCatchPhrase}}\",\r\n        \"bs\": \"{{originalBs}}\"\r\n    }\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/users/{{userId}}",
+          "protocol": "https",
+          "host": [
+            "jsonplaceholder",
+            "typicode",
+            "com"
+          ],
+          "path": [
+            "users",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "originalUser",
+      "value": ""
+    },
+    {
+      "key": "updatedName",
+      "value": ""
+    },
+    {
+      "key": "updatedEmail",
+      "value": ""
+    },
+    {
+      "key": "updatedCompanyName",
+      "value": ""
+    },
+    {
+      "key": "originalUsername",
+      "value": ""
+    },
+    {
+      "key": "originalAddress",
+      "value": ""
+    },
+    {
+      "key": "originalPhone",
+      "value": ""
+    },
+    {
+      "key": "originalWebsite",
+      "value": ""
+    },
+    {
+      "key": "originalCatchPhrase",
+      "value": ""
+    },
+    {
+      "key": "originalBs",
+      "value": ""
+    }
+  ]
+}
