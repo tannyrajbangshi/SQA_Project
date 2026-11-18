@@ -34,6 +34,7 @@ Clone the repository:
 
 ```bash
 git clone  https://github.com/tannyrajbangshi/SQA_Project.git 
+git clone https://github.com/tannyrajbangshi/SQA_Project.git
 ```
 
 Navigate to the project:
