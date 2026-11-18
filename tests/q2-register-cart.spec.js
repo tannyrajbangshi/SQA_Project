@@ -1,6 +1,7 @@
 
 import { test, expect } from '@playwright/test';
 import { getRegistrationData } from '../test-data/testData.js';
+import { captureScreenshot } from './helpers/screenshotHelper.js';
 
 test('Q2 - Register and Add Product to Cart', async ({ page }) => {
 
@@ -33,6 +34,12 @@ test('Q2 - Register and Add Product to Cart', async ({ page }) => {
 
     // Verify success notification
     await expect(page.locator('.bar-notification')).toBeVisible();
+    // Capture Q2 Screenshot
+    await captureScreenshot(
+    page,
+    test.info(),
+    'Q2-Product-Added-To-Cart'
+    );
 
     console.log('Q2 Registration and Cart Test Passed');
 

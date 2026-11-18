@@ -1,5 +1,6 @@
 
 import { test, expect } from '@playwright/test';
+import { captureScreenshot } from './helpers/screenshotHelper.js';
 
 test('Q1 - Invalid Login Test', async ({ page }) => {
 
@@ -13,6 +14,12 @@ test('Q1 - Invalid Login Test', async ({ page }) => {
 
     await expect(page.locator('.validation-summary-errors'))
         .toBeVisible();
+    await captureScreenshot(
+    page,
+    test.info(),
+    'Q1-Invalid-Login'
+);
+     
 
     console.log('Q1 Invalid Login Test Passed');
 
